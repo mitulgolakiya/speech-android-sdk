@@ -49,6 +49,7 @@ public class TextToSpeech {
     private URI hostURL;
     private TokenProvider tokenProvider = null;
     private String voice;
+    private TTSPlayCompletionListener playCompletionListener;
 
     /**Speech Recognition Shared Instance
      *
@@ -72,6 +73,10 @@ public class TextToSpeech {
         this.setHostURL(uri);
     }
 
+    public void setPlayCompletionListener(TTSPlayCompletionListener ttsPlayCompletionListener) {
+        this.playCompletionListener = ttsPlayCompletionListener;
+    }
+
     /**
      * Send request of TTS
      * @param ttsString
@@ -83,6 +88,7 @@ public class TextToSpeech {
         try {
             ttsUtility = new TTSUtility();
             ttsUtility.setCodec(TTSUtility.CODEC_WAV);
+            ttsUtility.setPlayCompletionListener(playCompletionListener);
             ttsUtility.synthesize(Arguments);
         }
         catch (Exception e) {

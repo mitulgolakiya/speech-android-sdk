@@ -48,11 +48,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 // IBM Watson SDK
 import com.ibm.watson.developer_cloud.android.speech_to_text.v1.dto.SpeechConfiguration;
 import com.ibm.watson.developer_cloud.android.speech_to_text.v1.ISpeechDelegate;
 import com.ibm.watson.developer_cloud.android.speech_to_text.v1.SpeechToText;
+import com.ibm.watson.developer_cloud.android.text_to_speech.v1.TTSPlayCompletionListener;
 import com.ibm.watson.developer_cloud.android.text_to_speech.v1.TextToSpeech;
 import com.ibm.watson.developer_cloud.android.speech_common.v1.TokenProvider;
 
@@ -76,7 +78,7 @@ public class MainActivity extends Activity {
     FragmentTabSTT fragmentTabSTT = new FragmentTabSTT();
     FragmentTabTTS fragmentTabTTS = new FragmentTabTTS();
 
-    public static class FragmentTabSTT extends Fragment implements ISpeechDelegate {
+    public static class FragmentTabSTT extends Fragment implements ISpeechDelegate implements TTSPlayCompletionListener {
 
         // session recognition results
         private static String mRecognitionResults = "";
@@ -291,7 +293,7 @@ public class MainActivity extends Activity {
 		        spinner.setAdapter(spinnerArrayAdapter);
                 spinner.setSelection(iIndexDefault);
             }
-        }  
+        }
 
         public void displayResult(final String result) {
             final Runnable runnableUi = new Runnable(){
@@ -525,6 +527,7 @@ public class MainActivity extends Activity {
 
             TextToSpeech.sharedInstance().setVoice(getString(R.string.voiceDefault));
 
+			TextToSpeech.sharedInstance().setPlayCompletionListener(this);
             return true;
         }
 
@@ -549,6 +552,11 @@ public class MainActivity extends Activity {
             viewInstructions.setText(spannable2);
             viewInstructions.setTextColor(0xFF121212);
         }
+
+		@Override
+ 		public void onPlayCompleted(String text) {
+			Toast.makeText(getActivity(), "Play completed : " + text, Toast.LENGTH_SHORT).show();
+		}
 
         public class ItemVoice {
 
@@ -676,7 +684,7 @@ public class MainActivity extends Activity {
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
-				
+
 		//setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_tab_text);
 
@@ -733,7 +741,7 @@ public class MainActivity extends Activity {
 
 	/**
 	 * Play TTS Audio data
-	 * 
+	 *
 	 * @param view
 	 */
 	public void playTTS(View view) throws JSONException {

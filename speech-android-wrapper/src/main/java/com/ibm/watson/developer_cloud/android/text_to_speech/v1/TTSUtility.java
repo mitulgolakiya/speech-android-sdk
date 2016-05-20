@@ -21,6 +21,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 
 import com.ibm.watson.developer_cloud.android.speech_to_text.v1.opus.OggOpus;
@@ -67,13 +68,25 @@ public class TTSUtility extends Application {
 	private int sampleRate;
 	private String server;
 	private AudioTrack audioTrack;
+    private TTSPlayCompletionListener playCompletionListener;
+    private Handler initializerThreadHandler;
 
 
-	public TTSUtility(){
+    private Runnable playCompletionRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (playCompletionListener != null) {
+                playCompletionListener.onPlayCompleted(content);
+            }
+        }
+    };
+
+    public TTSUtility(){
 		this.codec = CODEC_WAV;
         // By default, the sample rate would be detected by the SDK if the value is set to zero
         // However, the metadata is not reliable, need to decode at the maximum sample rate
         this.sampleRate = 48000;
+        initializerThreadHandler = new Handler();
 	}
 
     /**
@@ -95,6 +108,10 @@ public class TTSUtility extends Application {
             audioTrack.flush();
         }
 	}
+
+    public void setPlayCompletionListener(TTSPlayCompletionListener ttsPlayCompletionListener) {
+        this.playCompletionListener = ttsPlayCompletionListener;
+    }
 
 	/**
 	 * Text to speech
@@ -228,6 +245,7 @@ public class TTSUtility extends Application {
 				if (audioTrack != null && audioTrack.getState() != AudioTrack.STATE_UNINITIALIZED) {
 					audioTrack.release();
 				}
+                initializerThreadHandler.post(playCompletionRunnable);
 			}
 		}
 	}

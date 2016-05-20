@@ -40,6 +40,15 @@ public class SpeechConfiguration {
     public boolean isAuthNeeded = true;
     // SSL flag, this would be detected automatically
     public boolean isSSL = true;
+    // Word Confidence
+    public boolean wordConfidence = false;
+    // Timestamp
+    public boolean timestamps = false;
+    // Profanity Filter
+    public boolean profanityFilter = true;
+    // Maximum Alternatives
+    public int maxAlternatives = 3;
+
     /**
      * Instantiate default configuration
      */
